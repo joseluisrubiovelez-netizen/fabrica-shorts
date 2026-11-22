@@ -189,6 +189,32 @@ def cmd_token_tiktok(a) -> int:
     return flujo(cargar_config())
 
 
+def cmd_prueba_tiktok(a) -> int:
+    """Publica un vídeo concreto en TikTok (privado salvo auditoría). Se usa en la demo."""
+    import json
+    from pathlib import Path as _P
+
+    from .publicar.tiktok import subir
+    cfg = cargar_config()
+    ruta = _P(a.video)
+    if not ruta.exists():
+        print("No existe el vídeo", ruta)
+        return 1
+    meta = {"titulo": a.titulo, "texto_tiktok": a.titulo + " #misterio #relatos"}
+    junto = ruta.parent.parent / "meta.json"
+    if junto.exists():
+        meta.update(json.loads(junto.read_text(encoding="utf-8")))
+    pc = dict(cfg["plataformas"]["tiktok"])
+    print("== Relatos 3am Publisher: Content Posting API (Direct Post) ==")
+    print(f"Vídeo / Video: {ruta.name}  ·  Etiqueta IA / AI label: is_aigc = true")
+    print("Subiendo (FILE_UPLOAD) y publicando... / Uploading and posting...")
+    res = subir(cfg, ruta, meta, pc)
+    print(f"\nPublicado / Posted: id={res.get('id')}  url={res.get('url') or '(privado / private)'}")
+    for aviso in res.get("avisos", []):
+        print("Aviso / Note:", aviso)
+    return 0
+
+
 def cmd_verificar(a) -> int:
     cfg = cargar_config(modo=a.modo)
     claves = {
@@ -238,6 +264,10 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("token-tiktok", help="OAuth de TikTok (una vez)").set_defaults(
         f=cmd_token_tiktok)
     sub.add_parser("verificar", help="comprueba claves y modelos").set_defaults(f=cmd_verificar)
+    pt = sub.add_parser("prueba-tiktok", help="publica un vídeo concreto en TikTok (demo)")
+    pt.add_argument("video")
+    pt.add_argument("--titulo", default="Relato de ficción · Relatos 3am")
+    pt.set_defaults(f=cmd_prueba_tiktok)
     a = p.parse_args(argv)
     return a.f(a)
 
