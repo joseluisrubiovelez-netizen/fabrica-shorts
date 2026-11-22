@@ -13,7 +13,8 @@ config.yaml ─┐
  1. Ideación + guion (Gemini → Groq → semillas) ── SQLite (historial, sin repetir temas)
     · serie histórica: tema curado → texto de Wikipedia → guion SOLO con esos hechos →
       verificación afirmación a afirmación (si algo no está respaldado, se descarta)
- 2. Voz: Piper TTS local (es_ES-davefx, dataset CC0)
+ 2. Voz: Gemini TTS (voz Charon, 1 petición por vídeo, plan gratuito); respaldo Piper TTS local
+    (es_ES-davefx, dataset CC0) si no hay clave, se agota el cupo o el corte no cuadra
  3. Subtítulos: faster-whisper local + alineación con el texto exacto del guion
  4. Visuales por escena: FLUX (Cloudflare) / clips Pexels-Pixabay / fondo procedural
  5. Música + SFX (biblioteca con licencia o síntesis propia) con ducking bajo la voz
