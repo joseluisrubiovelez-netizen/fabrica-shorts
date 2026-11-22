@@ -24,6 +24,15 @@ def _version(cfg: Config) -> str:
     return cfg["plataformas"]["instagram"].get("api_version", "v23.0")
 
 
+def es_token_facebook(tok: str) -> bool:
+    """Los tokens del inicio de sesión unificado de Meta (usuario del sistema) empiezan por EAA."""
+    return tok.startswith("EAA")
+
+
+def host(tok: str) -> str:
+    return "graph.facebook.com" if es_token_facebook(tok) else "graph.instagram.com"
+
+
 def token(cfg: Config) -> tuple[str, str]:
     almacen = AlmacenTokens(cfg)
     g = almacen.get("instagram")
@@ -31,7 +40,9 @@ def token(cfg: Config) -> tuple[str, str]:
     uid = cfg.secreto("INSTAGRAM_USER_ID")
     if not (tok and uid):
         raise SinCredenciales("Instagram sin token/ID de usuario en .env")
-    # Los tokens de larga duración caducan a los 60 días: se renuevan cada 30.
+    if es_token_facebook(tok):
+        return tok, uid   # token de usuario del sistema: no caduca, no se renueva
+    # Los tokens de Instagram de larga duración caducan a los 60 días: se renuevan cada 30.
     if time.time() - g.get("renovado", 0) > RENOVAR_DIAS * 86400:
         r = requests.get("https://graph.instagram.com/refresh_access_token", timeout=TIMEOUT,
                          params={"grant_type": "ig_refresh_token", "access_token": tok})
@@ -59,7 +70,7 @@ def _comprobar(r: requests.Response) -> dict[str, Any]:
 def subir(cfg: Config, ruta: Path, meta: dict[str, Any], pc: dict[str, Any]) -> dict[str, Any]:
     tok, uid = token(cfg)
     v = _version(cfg)
-    base = f"https://graph.instagram.com/{v}"
+    base = f"https://{host(tok)}/{v}"
     cont = _comprobar(requests.post(f"{base}/{uid}/media", timeout=TIMEOUT, data={
         "media_type": "REELS", "upload_type": "resumable",
         "caption": meta["texto_instagram"][:2200], "share_to_feed": "true",
@@ -93,7 +104,7 @@ def subir(cfg: Config, ruta: Path, meta: dict[str, Any], pc: dict[str, Any]) -> 
 
 def metricas(cfg: Config, ids: list[str]) -> dict[str, dict[str, Any]]:
     tok, _ = token(cfg)
-    base = f"https://graph.instagram.com/{_version(cfg)}"
+    base = f"https://{host(tok)}/{_version(cfg)}"
     res = {}
     for mid in ids:
         r = requests.get(f"{base}/{mid}/insights", timeout=TIMEOUT, params={
