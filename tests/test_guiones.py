@@ -59,6 +59,23 @@ def test_prompt_incluye_reglas(cfg):
     assert "verificables" in p and "tema viejo" in p and "SUAVE" in p
 
 
+def test_respuesta_llm_en_cualquier_formato():
+    g = {"titulo": "x", "escenas": []}
+    assert guiones.normalizar_respuesta({"guiones": [g]}) == [g]
+    assert guiones.normalizar_respuesta([g, "basura", 3]) == [g]    # lista suelta (caso real)
+    assert guiones.normalizar_respuesta(g) == [g]
+    assert guiones.normalizar_respuesta("texto") == []
+    assert guiones.normalizar_respuesta(None) == []
+
+
+def test_guion_mal_formado_no_tumba_el_lote(cfg, db, monkeypatch):
+    raro = {"titulo": "x", "tema": "t", "gancho": "g", "escenas": "no es lista",
+            "descripcion": "d", "cta": "c", "hashtags": ["#a"]}
+    monkeypatch.setattr(guiones, "_llamar_proveedor", lambda *a: [raro])
+    monkeypatch.setitem(cfg.datos["proveedores"], "guiones", ["gemini"])
+    assert guiones.generar_lote(cfg, db, "expedientes") == 0
+
+
 def test_extraer_json_tolerante():
     assert llm.extraer_json('```json\n{"guiones": []}\n```') == {"guiones": []}
     assert llm.extraer_json('Aquí tienes: {"a": 1} gracias') == {"a": 1}

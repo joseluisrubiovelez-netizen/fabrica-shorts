@@ -206,7 +206,16 @@ def _llamar_json(cfg: Config, nombre: str, prompt: str) -> Any:
 
 
 def _llamar_proveedor(cfg: Config, nombre: str, prompt: str) -> list[dict[str, Any]]:
-    return (_llamar_json(cfg, nombre, prompt) or {}).get("guiones", [])
+    return normalizar_respuesta(_llamar_json(cfg, nombre, prompt))
+
+
+def normalizar_respuesta(datos: Any) -> list[dict[str, Any]]:
+    """Acepta {"guiones": [...]}, una lista suelta o un único guion; descarta lo demás."""
+    if isinstance(datos, dict):
+        datos = datos.get("guiones", [datos] if "escenas" in datos else [])
+    if not isinstance(datos, list):
+        return []
+    return [g for g in datos if isinstance(g, dict)]
 
 
 def _historicos(cfg: Config, db: DB, serie: dict[str, Any], proveedor: str,
@@ -250,8 +259,11 @@ def generar_lote(cfg: Config, db: DB, serie_id: str | None = None,
             continue
         for g in candidatos:
             g["serie"] = serie_id
-            errores = validar_guion(g, serie["tipo"])
-            motivo = None if errores else es_repetido(g, temas, ganchos)
+            try:
+                errores = validar_guion(g, serie["tipo"])
+                motivo = None if errores else es_repetido(g, temas, ganchos)
+            except (AttributeError, TypeError, KeyError) as e:   # JSON con forma inesperada
+                errores, motivo = [f"formato inesperado: {e}"], None
             if errores or motivo:
                 L.info("Guion descartado (%s): %s", g.get("titulo", "?"), errores or motivo)
                 continue
