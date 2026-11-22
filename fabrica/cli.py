@@ -215,6 +215,31 @@ def cmd_prueba_tiktok(a) -> int:
     return 0
 
 
+def cmd_prueba_youtube(a) -> int:
+    """Sube un vídeo concreto a YouTube en privado. Se usa en la grabación para la auditoría."""
+    from pathlib import Path as _P
+
+    from .publicar.youtube import cuerpo_video, subir
+    cfg = cargar_config()
+    ruta = _P(a.video)
+    if not ruta.exists():
+        print("No existe el vídeo", ruta)
+        return 1
+    meta = {"titulo": a.titulo, "hashtags": {"youtube": ["#Shorts", "#misterio"]},
+            "texto_youtube": "Relato de ficción. Narración e imágenes generadas con IA."}
+    pc = dict(cfg["plataformas"]["youtube"], privacidad="private")
+    cuerpo = cuerpo_video(meta, pc)
+    print("== Relatos 3am Publisher: YouTube Data API v3 (videos.insert) ==")
+    print(f"Vídeo / Video: {ruta.name}")
+    print(f"Título / Title: {cuerpo['snippet']['title']}")
+    print("Privacidad / Privacy: private  ·  containsSyntheticMedia = true (etiqueta IA)"
+          "  ·  selfDeclaredMadeForKids = false")
+    print("Subiendo... / Uploading...")
+    res = subir(cfg, ruta, meta, pc)
+    print(f"\nSubido / Uploaded: {res['url']}")
+    return 0
+
+
 def cmd_verificar(a) -> int:
     cfg = cargar_config(modo=a.modo)
     claves = {
@@ -268,6 +293,10 @@ def main(argv: list[str] | None = None) -> int:
     pt.add_argument("video")
     pt.add_argument("--titulo", default="Relato de ficción · Relatos 3am")
     pt.set_defaults(f=cmd_prueba_tiktok)
+    py_ = sub.add_parser("prueba-youtube", help="sube un vídeo concreto a YouTube en privado")
+    py_.add_argument("video")
+    py_.add_argument("--titulo", default="Las sombras ausentes · Relatos 3am")
+    py_.set_defaults(f=cmd_prueba_youtube)
     a = p.parse_args(argv)
     return a.f(a)
 
