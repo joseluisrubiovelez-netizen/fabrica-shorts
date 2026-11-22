@@ -1,4 +1,4 @@
-"""Voz en off con Piper TTS (local, voz es_ES-davefx: dataset CC0)."""
+"""Voz en off: Gemini TTS (voz Puck por defecto) o Piper TTS local (es_ES-davefx, CC0) de respaldo."""
 from __future__ import annotations
 
 import io
@@ -90,15 +90,34 @@ def _montar(segmentos: list[np.ndarray], sr: int, n_escenas: int
     return audio, list(zip(inicios, fines)), voz_seg
 
 
+def sintetizar_gemini(segmentos_texto: list[str], gemini: dict) -> tuple[list[np.ndarray], int]:
+    """Una llamada por segmento; se hace una sola vez (la velocidad se ajusta luego con atempo)."""
+    from . import voz_gemini
+    segs, sr = [], voz_gemini.SR
+    for texto in segmentos_texto:
+        a, sr = voz_gemini.sintetizar(texto, gemini["clave"], gemini.get("voz", "Puck"),
+                                      gemini.get("modelos"), gemini.get("estilo"))
+        segs.append(_recortar_silencio(a, sr))
+    return segs, sr
+
+
 def generar_locucion(segmentos_texto: list[str], modelo: str, salida: Path,
-                     dur_min: float, dur_max: float, velocidad: float = 1.0) -> Locucion:
+                     dur_min: float, dur_max: float, velocidad: float = 1.0,
+                     gemini: dict | None = None) -> Locucion:
+    """Con `gemini` ({clave, voz, modelos, estilo}) usa Gemini TTS; si no, Piper (`modelo`)."""
     n_escenas = len(segmentos_texto) - 2
     ls = velocidad
+    base = sintetizar_gemini(segmentos_texto, gemini) if gemini else None
     for _ in range(3):
         segs, sr = [], 22050
-        for texto in segmentos_texto:
-            a, sr = sintetizar(texto, modelo, ls)
-            segs.append(a)
+        if base:
+            from .voz_gemini import cambiar_tempo
+            sr = base[1]
+            segs = [cambiar_tempo(a, sr, 1.0 / ls) for a in base[0]]
+        else:
+            for texto in segmentos_texto:
+                a, sr = sintetizar(texto, modelo, ls)
+                segs.append(a)
         audio, tramos, voz_seg = _montar(segs, sr, n_escenas)
         dur = len(audio) / sr
         objetivo = None

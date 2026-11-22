@@ -108,11 +108,10 @@ def _producir_intento(cfg: Config, db: DB, g: dict[str, Any], serie: dict[str, A
     segmentos = [g["gancho"]] + [e["narracion"] for e in g["escenas"]] + [g["cta"]]
     modelo_voz = str(cfg.raiz / pv["voz"]["modelo"])
     velocidad = float(pv["voz"].get("velocidad", 1.0)) * (1.0 + 0.03 * intento)
-    loc = voz.generar_locucion(segmentos, modelo_voz, carpeta / "voz.wav",
-                               vcfg["duracion_min"], vcfg["duracion_max"], velocidad)
+    loc, proveedor_voz, fuente_voz, licencia_voz = _locucion(
+        cfg, db, segmentos, modelo_voz, carpeta / "voz.wav", velocidad)
     crono("voz")
-    db.registrar_asset(video_id, "voz", "piper", Path(modelo_voz).name, pv["voz"]["licencia"],
-                       str(loc.ruta))
+    db.registrar_asset(video_id, "voz", proveedor_voz, fuente_voz, licencia_voz, str(loc.ruta))
     # 2) Subtítulos palabra a palabra
     palabras_guion = " ".join(segmentos).split()
     try:
@@ -178,6 +177,28 @@ def _producir_intento(cfg: Config, db: DB, g: dict[str, Any], serie: dict[str, A
     meta["tiempos_s"] = crono.tiempos
     meta["proveedores_visuales"] = sorted({a["proveedor"] for a in assets if a["tipo"] == "visual"})
     return salida, resultado, meta
+
+
+def _locucion(cfg: Config, db: DB, segmentos: list[str], modelo_voz: str, salida: Path,
+              velocidad: float) -> tuple[voz.Locucion, str, str, str]:
+    """Gemini TTS (voz configurada, Puck por defecto) y, si falla o no hay clave, Piper."""
+    vcfg, pv = cfg["video"], cfg["proveedores"]["voz"]
+    gcfg = pv.get("gemini") or {}
+    clave = cfg.secreto("GEMINI_API_KEY")
+    if pv.get("motor", "piper") == "gemini" and clave:
+        nombre = gcfg.get("voz", "Puck")
+        try:
+            loc = voz.generar_locucion(
+                segmentos, modelo_voz, salida, vcfg["duracion_min"], vcfg["duracion_max"],
+                velocidad, gemini={"clave": clave, "voz": nombre, "modelos": gcfg.get("modelos"),
+                                   "estilo": gcfg.get("estilo")})
+            return loc, "gemini-tts", nombre, gcfg.get("licencia", "Gemini API (audio generado)")
+        except Exception as e:
+            L.warning("Gemini TTS no disponible (%s); uso Piper", e)
+            db.evento("aviso", "voz", f"gemini tts: {e}")
+    loc = voz.generar_locucion(segmentos, modelo_voz, salida, vcfg["duracion_min"],
+                               vcfg["duracion_max"], velocidad)
+    return loc, "piper", Path(modelo_voz).name, pv["licencia"]
 
 
 class _Crono:

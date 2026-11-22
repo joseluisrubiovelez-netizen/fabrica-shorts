@@ -38,6 +38,16 @@ proveedores:
   # Proporción aproximada de escenas que usan clip de stock en vez de imagen IA.
   proporcion_stock: 0.25
   voz:
+    # gemini: Gemini TTS (necesita GEMINI_API_KEY); si falla o se agota la cuota, se usa Piper.
+    motor: gemini
+    gemini:
+      voz: Puck
+      modelos: [gemini-2.5-flash-preview-tts, gemini-2.5-pro-preview-tts]
+      estilo: >-
+        Narra en castellano de España, como un narrador de misterio:
+        voz grave, pausada e inquietante, sin exagerar
+      licencia: "Gemini API TTS (voz Puck) · audio generado, uso según condiciones de Google"
+    # Respaldo local
     modelo: models/es_ES-davefx-medium.onnx
     licencia: "Piper (GPL-3.0, herramienta) · dataset davefx CC0"
     velocidad: 1.0               # length_scale: >1 más lento

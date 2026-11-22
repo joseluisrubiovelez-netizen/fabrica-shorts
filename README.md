@@ -13,7 +13,7 @@ config.yaml ─┐
  1. Ideación + guion (Gemini → Groq → semillas) ── SQLite (historial, sin repetir temas)
     · serie histórica: tema curado → texto de Wikipedia → guion SOLO con esos hechos →
       verificación afirmación a afirmación (si algo no está respaldado, se descarta)
- 2. Voz: Piper TTS local (es_ES-davefx, dataset CC0)
+ 2. Voz: Gemini TTS con la voz **Puck** (respaldo: Piper TTS local, es_ES-davefx, CC0)
  3. Subtítulos: faster-whisper local + alineación con el texto exacto del guion
  4. Visuales por escena: FLUX (Cloudflare) / clips Pexels-Pixabay / fondo procedural
  5. Música + SFX (biblioteca con licencia o síntesis propia) con ducking bajo la voz
@@ -58,6 +58,14 @@ Se elige en `config.yaml` (`modo`), con la variable `FABRICA_MODO` o con `--modo
 | Solo APIs oficiales | YouTube Data API v3, TikTok Content Posting API, Instagram API. Sin scraping ni navegador. |
 | Sin violencia gráfica, sexo ni público infantil | Lista de bloqueo + prompt + `selfDeclaredMadeForKids=false` |
 | Sin secretos en el código | `.env` / GitHub Secrets; los tokens que rotan se guardan cifrados (Fernet) |
+
+## Voz por escena
+
+Locución por escena de un storyboard (una pista por escena en `episodes/<id>/audio/`):
+
+```bash
+python -I scripts/voz_gemini.py episodio episodes/<id>/storyboard.json --voz Puck
+```
 
 ## Estructura
 

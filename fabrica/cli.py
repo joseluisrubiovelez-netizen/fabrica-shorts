@@ -257,7 +257,11 @@ def cmd_verificar(a) -> int:
         estado = ", ".join(f"{k}={'OK' if cfg.secreto(k) else 'falta'}" for k in ks)
         print(f"- {grupo}: {estado}")
     voz = cfg.raiz / cfg["proveedores"]["voz"]["modelo"]
-    print(f"- Voz Piper: {'OK' if voz.exists() else 'falta (ejecuta make setup)'}")
+    pv = cfg["proveedores"]["voz"]
+    if pv.get("motor") == "gemini":
+        print(f"- Voz Gemini TTS ({(pv.get('gemini') or {}).get('voz', 'Puck')}): "
+              f"{'OK' if cfg.secreto('GEMINI_API_KEY') else 'falta GEMINI_API_KEY'}")
+    print(f"- Voz Piper (respaldo): {'OK' if voz.exists() else 'falta (ejecuta make setup)'}")
     return 0
 
 
