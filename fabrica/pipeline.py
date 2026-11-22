@@ -106,13 +106,8 @@ def _producir_intento(cfg: Config, db: DB, g: dict[str, Any], serie: dict[str, A
     crono = _Crono(video_id)
     # 1) Voz
     segmentos = [g["gancho"]] + [e["narracion"] for e in g["escenas"]] + [g["cta"]]
-    modelo_voz = str(cfg.raiz / pv["voz"]["modelo"])
-    velocidad = float(pv["voz"].get("velocidad", 1.0)) * (1.0 + 0.03 * intento)
-    loc = voz.generar_locucion(segmentos, modelo_voz, carpeta / "voz.wav",
-                               vcfg["duracion_min"], vcfg["duracion_max"], velocidad)
+    loc = _locucion(cfg, db, video_id, segmentos, carpeta, intento)
     crono("voz")
-    db.registrar_asset(video_id, "voz", "piper", Path(modelo_voz).name, pv["voz"]["licencia"],
-                       str(loc.ruta))
     # 2) Subtítulos palabra a palabra
     palabras_guion = " ".join(segmentos).split()
     try:
@@ -178,6 +173,54 @@ def _producir_intento(cfg: Config, db: DB, g: dict[str, Any], serie: dict[str, A
     meta["tiempos_s"] = crono.tiempos
     meta["proveedores_visuales"] = sorted({a["proveedor"] for a in assets if a["tipo"] == "visual"})
     return salida, resultado, meta
+
+
+def _hoy(cfg: Config) -> str:
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+    return datetime.now(ZoneInfo(cfg.get("zona_horaria", "Europe/Madrid"))).date().isoformat()
+
+
+def _locucion(cfg: Config, db: DB, video_id: int, segmentos: list[str], carpeta: Path,
+              intento: int) -> voz.Locucion:
+    """Gemini TTS si está activo y queda cupo; si no, o si falla, Piper (local)."""
+    vcfg, pv = cfg["video"], cfg["proveedores"]
+    gcfg = pv["voz"].get("gemini") or {}
+    if gcfg.get("activo"):
+        hoy = _hoy(cfg)
+        clave_cupo = f"gemini_tts_peticiones:{hoy}"
+        usadas = int(db.kv_get(clave_cupo, "0") or 0)
+        bruto = carpeta.parent / "voz_gemini_bruto.wav"   # compartido entre intentos de QA
+        if not bruto.exists() and db.kv_get("gemini_tts_agotado") == hoy:
+            L.info("Gemini TTS agotado hoy: uso Piper")
+        elif not bruto.exists() and usadas >= int(gcfg.get("max_peticiones_dia", 6)):
+            L.info("Límite propio de Gemini TTS alcanzado (%d hoy): uso Piper", usadas)
+        else:
+            from . import voz_gemini
+            try:
+                loc, pidio = voz_gemini.generar_locucion(
+                    segmentos, carpeta / "voz.wav", vcfg["duracion_min"], vcfg["duracion_max"],
+                    cfg.secreto("GEMINI_API_KEY"), gcfg.get("voz", "Charon"),
+                    float(gcfg.get("velocidad", 1.0)) * (1.0 + 0.03 * intento), bruto,
+                    gcfg.get("modelo", voz_gemini.MODELO), gcfg.get("estilo") or voz_gemini.ESTILO)
+                if pidio:
+                    db.kv_set(clave_cupo, str(usadas + 1))
+                db.registrar_asset(video_id, "voz", "gemini-tts", gcfg.get("voz", "Charon"),
+                                   voz_gemini.LICENCIA, str(loc.ruta))
+                return loc
+            except voz_gemini.CuotaTTSAgotada as e:
+                db.kv_set("gemini_tts_agotado", hoy)
+                db.evento("aviso", "voz", str(e))
+            except Exception as e:   # corte que no cuadra, red, etc.: nunca bloquea el vídeo
+                L.warning("Gemini TTS falló (%s); uso Piper", e)
+                db.evento("aviso", "voz", f"gemini: {e}")
+    modelo_voz = str(cfg.raiz / pv["voz"]["modelo"])
+    velocidad = float(pv["voz"].get("velocidad", 1.0)) * (1.0 + 0.03 * intento)
+    loc = voz.generar_locucion(segmentos, modelo_voz, carpeta / "voz.wav",
+                               vcfg["duracion_min"], vcfg["duracion_max"], velocidad)
+    db.registrar_asset(video_id, "voz", "piper", Path(modelo_voz).name, pv["voz"]["licencia"],
+                       str(loc.ruta))
+    return loc
 
 
 class _Crono:

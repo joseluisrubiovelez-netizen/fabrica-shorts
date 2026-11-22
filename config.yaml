@@ -41,6 +41,14 @@ proveedores:
     modelo: models/es_ES-davefx-medium.onnx
     licencia: "Piper (GPL-3.0, herramienta) · dataset davefx CC0"
     velocidad: 1.0               # length_scale: >1 más lento
+    # Voz principal opcional: Gemini TTS (plan gratuito, 10 peticiones/día por proyecto de Google).
+    # Una petición por vídeo; los reintentos de QA reutilizan el audio. Si falla o no hay cupo,
+    # se usa Piper. Si la misma clave se usa en otro canal, reparte el cupo con max_peticiones_dia.
+    gemini:
+      activo: true
+      voz: Charon                # Charon (informativo, grave) · Algenib (rasgada) · Enceladus (susurrada)
+      velocidad: 1.0             # atempo; la duración se ajusta sola al rango de video
+      max_peticiones_dia: 6
   whisper:
     modelo: small                # tiny | base | small (más preciso, más lento)
 
