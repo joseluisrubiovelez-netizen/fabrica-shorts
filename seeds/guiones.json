@@ -1,0 +1,230 @@
+[
+  {
+    "serie": "expedientes",
+    "tema": "campana que suena en un pueblo sin campanario",
+    "titulo": "La campana que suena sin campanario",
+    "estructura": "dato_imposible",
+    "tipo_gancho": "afirmacion_imposible",
+    "es_ficcion": true,
+    "gancho": "En Valdemora, la campana suena sin campanario.",
+    "escenas": [
+      {"narracion": "Expediente doce. Valdemora, un pueblo de once vecinos que perdió su iglesia en un incendio hace setenta años.", "texto_pantalla": "Valdemora", "prompt_imagen": "ruins of a burned stone church in a tiny Spanish village at night, thick fog, empty square", "busqueda_stock": "foggy village night", "sfx": "ninguno"},
+      {"narracion": "Desde entonces, cada noche de niebla, a las tres y diez, se oye una campana. Tres golpes. Siempre tres.", "texto_pantalla": "3:10", "prompt_imagen": "old bronze church bell lying on the ground among stones, fog, moonlight", "busqueda_stock": "church bell", "sfx": "campana"},
+      {"narracion": "El ayuntamiento dejó una grabadora en la plaza. Registró los tres golpes con total claridad.", "texto_pantalla": "Grabación 1", "prompt_imagen": "vintage cassette recorder on a stone bench in an empty foggy plaza at night", "busqueda_stock": "old tape recorder", "sfx": "estatica"},
+      {"narracion": "Lo inquietante no es el sonido. Es que la grabadora estaba dentro de una caja cerrada con llave, y la caja apareció abierta.", "texto_pantalla": "", "prompt_imagen": "open metal box with a broken padlock on wet cobblestones, fog, single street lamp", "busqueda_stock": "open box dark", "sfx": "golpe"}
+    ],
+    "cta": "Mañana, el expediente trece.",
+    "descripcion": "Relato de ficción. Valdemora no aparece en ningún mapa, pero sus vecinos juran oír la campana cada noche de niebla.",
+    "hashtags": {"youtube": ["#Shorts", "#misterio", "#terror", "#relatos"], "tiktok": ["#misterio", "#terror", "#historiasdeterror", "#relatos"], "instagram": ["#misterio", "#terror", "#relatosdeterror", "#reels"]},
+    "fuentes": []
+  },
+  {
+    "serie": "expedientes",
+    "tema": "carretera cerrada cuya línea se repinta sola",
+    "titulo": "La línea que se pinta sola en una carretera cerrada",
+    "estructura": "documento_encontrado",
+    "tipo_gancho": "dato_concreto",
+    "es_ficcion": true,
+    "gancho": "Alguien repinta cada noche esta carretera cerrada.",
+    "escenas": [
+      {"narracion": "Expediente veintiuno. Una carretera comarcal entre dos pueblos que ya no aparecen en el mapa.", "texto_pantalla": "Km 47", "prompt_imagen": "abandoned two-lane country road in Spain at dusk, cracked asphalt, fog, no cars", "busqueda_stock": "empty road fog", "sfx": "viento"},
+      {"narracion": "Los repartidores lo comentan en voz baja: en ese tramo, la línea blanca siempre está recién pintada.", "texto_pantalla": "", "prompt_imagen": "close up of a fresh glossy white road line on old cracked asphalt at night", "busqueda_stock": "road lines night", "sfx": "ninguno"},
+      {"narracion": "Nadie la mantiene. La carretera lleva cerrada al tráfico desde hace veinte años.", "texto_pantalla": "Cerrada desde 2006", "prompt_imagen": "rusty road closed barrier with faded sign, overgrown road behind, fog", "busqueda_stock": "road closed sign", "sfx": "ninguno"},
+      {"narracion": "Un vecino dejó una cámara toda la noche. Al amanecer, la línea estaba fresca. En la grabación, la carretera aparece vacía, pero la pintura avanza sola.", "texto_pantalla": "Cámara 2", "prompt_imagen": "security camera view of an empty road at night, white line extending into fog, grainy", "busqueda_stock": "night road camera", "sfx": "estatica"}
+    ],
+    "cta": "Sigue la serie para el siguiente expediente.",
+    "descripcion": "Relato de ficción. Un tramo de carretera abandonado que alguien, o algo, sigue cuidando.",
+    "hashtags": {"youtube": ["#Shorts", "#misterio", "#terror", "#leyendasurbanas"], "tiktok": ["#misterio", "#terror", "#creepy", "#relatos"], "instagram": ["#misterio", "#terror", "#historias", "#reels"]},
+    "fuentes": []
+  },
+  {
+    "serie": "expedientes",
+    "tema": "pozo que devuelve las piedras que le tiran",
+    "titulo": "El pozo que devuelve todo lo que le tiras",
+    "estructura": "cronologica",
+    "tipo_gancho": "afirmacion_imposible",
+    "es_ficcion": true,
+    "gancho": "Lo que cae a este pozo, vuelve.",
+    "escenas": [
+      {"narracion": "Expediente treinta y cuatro. Un pozo de piedra en una finca abandonada de Teruel.", "texto_pantalla": "Teruel", "prompt_imagen": "old stone well in an abandoned farm in rural Spain, dry grass, fog at dawn", "busqueda_stock": "old stone well", "sfx": "viento"},
+      {"narracion": "Los pastores tiraban piedras para medir su profundidad. Nunca oyeron el fondo.", "texto_pantalla": "", "prompt_imagen": "looking down into a deep dark stone well, darkness, moss on stones", "busqueda_stock": "deep well dark", "sfx": "goteo"},
+      {"narracion": "A la mañana siguiente, las piedras aparecían junto al brocal. Secas.", "texto_pantalla": "Secas", "prompt_imagen": "small pile of dry stones neatly stacked next to a stone well, morning mist", "busqueda_stock": "stacked stones", "sfx": "ninguno"},
+      {"narracion": "En mil novecientos ochenta, alguien selló el pozo con una losa de hormigón. Al día siguiente, la losa seguía intacta. Encima, ordenadas por tamaño, estaban todas las piedras de los últimos cuarenta años.", "texto_pantalla": "1980", "prompt_imagen": "concrete slab covering a stone well with hundreds of stones arranged in rows by size on top, fog", "busqueda_stock": "stones arranged", "sfx": "golpe"}
+    ],
+    "cta": "¿Tú lo destaparías? Te leo.",
+    "descripcion": "Relato de ficción. Un pozo sin fondo con una costumbre muy extraña.",
+    "hashtags": {"youtube": ["#Shorts", "#misterio", "#terror", "#relatoscortos"], "tiktok": ["#misterio", "#terror", "#historiasdeterror", "#paranormal"], "instagram": ["#misterio", "#relatos", "#terror", "#reels"]},
+    "fuentes": []
+  },
+  {
+    "serie": "expedientes",
+    "tema": "relojes que se paran todos a la misma hora en una casa heredada",
+    "titulo": "Todos los relojes se paran a las 4:17",
+    "estructura": "in_medias_res",
+    "tipo_gancho": "dato_concreto",
+    "es_ficcion": true,
+    "gancho": "Todos los relojes de esta casa se pararon igual.",
+    "escenas": [
+      {"narracion": "Expediente cuarenta. Una casa de labranza en Zamora, vacía desde que murió su última dueña.", "texto_pantalla": "Zamora", "prompt_imagen": "old Spanish farmhouse interior, dusty room full of antique wall clocks, dim window light", "busqueda_stock": "antique clocks", "sfx": "ninguno"},
+      {"narracion": "Tenía catorce relojes. Cuando entraron los herederos, todos estaban parados a las cuatro y diecisiete.", "texto_pantalla": "4:17", "prompt_imagen": "close up of an antique clock face stopped at 4:17, dust, candle light", "busqueda_stock": "clock stopped", "sfx": "golpe"},
+      {"narracion": "Les cambiaron las pilas. Les dieron cuerda. Volvieron a pararse a la misma hora, uno detrás de otro.", "texto_pantalla": "", "prompt_imagen": "row of old clocks on a wooden wall in a dark corridor, all showing the same time", "busqueda_stock": "old clock pendulum", "sfx": "latido"},
+      {"narracion": "Un relojero se llevó el más antiguo a su taller, a cien kilómetros. Al día siguiente, a las cuatro y diecisiete, se pararon todos los relojes del taller.", "texto_pantalla": "100 km", "prompt_imagen": "watchmaker workshop at night, many clocks on the walls, empty workbench, eerie light", "busqueda_stock": "clock workshop", "sfx": "campana"}
+    ],
+    "cta": "Mañana abrimos otro expediente.",
+    "descripcion": "Relato de ficción. Una herencia con una hora maldita.",
+    "hashtags": {"youtube": ["#Shorts", "#misterio", "#terror", "#paranormal"], "tiktok": ["#misterio", "#terror", "#paranormal", "#relatos"], "instagram": ["#misterio", "#paranormal", "#terror", "#reels"]},
+    "fuentes": []
+  },
+  {
+    "serie": "expedientes",
+    "tema": "niebla del Pirineo y una silueta de más en las fotos",
+    "titulo": "Eran seis. En las fotos salían siete",
+    "estructura": "cuenta_atras",
+    "tipo_gancho": "afirmacion_imposible",
+    "es_ficcion": true,
+    "gancho": "La niebla de este valle sabe contar.",
+    "escenas": [
+      {"narracion": "Expediente cincuenta y dos. Un valle del Pirineo donde la niebla baja siempre a la misma hora.", "texto_pantalla": "Pirineo", "prompt_imagen": "mountain valley in the Pyrenees covered by thick rolling fog at sunset, pine forest", "busqueda_stock": "mountain fog valley", "sfx": "viento"},
+      {"narracion": "Un grupo de senderistas se perdió en ella durante veinte minutos. Eran seis.", "texto_pantalla": "6", "prompt_imagen": "hiking trail disappearing into dense fog, backpacks silhouettes far away, no faces", "busqueda_stock": "foggy hiking trail", "sfx": "ninguno"},
+      {"narracion": "Al salir, revisaron las fotos del móvil. En todas, dentro de la niebla, se veían siete siluetas.", "texto_pantalla": "7", "prompt_imagen": "grainy phone photo of seven dark silhouettes in thick fog on a mountain path, seen from behind", "busqueda_stock": "silhouettes fog", "sfx": "latido"},
+      {"narracion": "Volvieron a contarse. Seis. Pero en la última foto, tomada ya fuera de la niebla, la séptima silueta seguía detrás de ellos.", "texto_pantalla": "", "prompt_imagen": "a lone dark silhouette standing at the edge of a fog bank on a mountain trail, dusk", "busqueda_stock": "fog forest edge", "sfx": "golpe"}
+    ],
+    "cta": "Sigue la serie si quieres saber quién era.",
+    "descripcion": "Relato de ficción. Una excursión normal hasta que alguien revisó las fotos.",
+    "hashtags": {"youtube": ["#Shorts", "#misterio", "#terror", "#montaña"], "tiktok": ["#misterio", "#terror", "#creepy", "#historiasdeterror"], "instagram": ["#misterio", "#terror", "#relatos", "#reels"]},
+    "fuentes": []
+  },
+  {
+    "serie": "lo_que_oi",
+    "tema": "telefonillo que llama desde un piso vacío",
+    "titulo": "El telefonillo sonó a las 3 de la mañana",
+    "estructura": "testimonio",
+    "tipo_gancho": "sonido",
+    "es_ficcion": true,
+    "gancho": "A las tres de la mañana, sonó el telefonillo.",
+    "escenas": [
+      {"narracion": "Me pasó en un piso de alquiler en Valladolid. Vivía sola, en un cuarto sin ascensor.", "texto_pantalla": "Valladolid", "prompt_imagen": "old Spanish apartment building entrance at night, intercom panel lit, sodium street light", "busqueda_stock": "apartment intercom night", "sfx": "ninguno"},
+      {"narracion": "Contesté medio dormida. Al otro lado, una voz dijo mi nombre completo. Con los dos apellidos.", "texto_pantalla": "", "prompt_imagen": "close up of a wall intercom handset in a dark hallway, faint light", "busqueda_stock": "intercom handset", "sfx": "estatica"},
+      {"narracion": "Bajé a mirar. No había nadie en el portal. El telefonillo nuevo guardaba un registro de llamadas.", "texto_pantalla": "Portal vacío", "prompt_imagen": "empty building lobby at night with mailboxes, flickering ceiling light", "busqueda_stock": "empty lobby night", "sfx": "puerta"},
+      {"narracion": "La llamada no venía de la calle. Venía del piso de arriba. El que lleva vacío desde que me mudé.", "texto_pantalla": "5º B", "prompt_imagen": "staircase going up into darkness in an old apartment building, a door slightly open upstairs", "busqueda_stock": "dark staircase", "sfx": "golpe"}
+    ],
+    "cta": "Esto es Lo que oí. Mañana, otro relato.",
+    "descripcion": "Relato de ficción. Una llamada que no debería existir.",
+    "hashtags": {"youtube": ["#Shorts", "#terror", "#historiasdeterror", "#misterio"], "tiktok": ["#terror", "#historiasdeterror", "#misterio", "#creepy"], "instagram": ["#terror", "#relatosdeterror", "#misterio", "#reels"]},
+    "fuentes": []
+  },
+  {
+    "serie": "lo_que_oi",
+    "tema": "audio de whatsapp de un abuelo fallecido",
+    "titulo": "Me llegó un audio de mi abuelo. Murió hace dos años",
+    "estructura": "testimonio",
+    "tipo_gancho": "afirmacion_imposible",
+    "es_ficcion": true,
+    "gancho": "Me llegó un audio de mi abuelo muerto.",
+    "escenas": [
+      {"narracion": "Lo escuché en el metro, camino del trabajo. Duraba once segundos.", "texto_pantalla": "0:11", "prompt_imagen": "empty subway car at night, phone screen glowing on a seat, motion blur", "busqueda_stock": "subway night empty", "sfx": "ninguno"},
+      {"narracion": "Solo se oía su respiración y, de fondo, la radio de su cocina. La misma emisora de siempre.", "texto_pantalla": "", "prompt_imagen": "old kitchen with a vintage radio on the table, warm dim lamp, empty chair", "busqueda_stock": "vintage radio kitchen", "sfx": "estatica"},
+      {"narracion": "Pensé que alguien había usado su número. Pero la línea estaba dada de baja.", "texto_pantalla": "Línea dada de baja", "prompt_imagen": "old mobile phone on a wooden table in the dark, screen off, dust", "busqueda_stock": "old phone table", "sfx": "ninguno"},
+      {"narracion": "Lo puse otra vez esa noche. Ya no duraba once segundos. Duraba doce. Y en el último, susurraba: ya casi estoy.", "texto_pantalla": "0:12", "prompt_imagen": "phone screen in a dark bedroom showing an audio message waveform, faint blue light", "busqueda_stock": "phone dark room", "sfx": "latido"}
+    ],
+    "cta": "Sigue Lo que oí para más relatos.",
+    "descripcion": "Relato de ficción. Un mensaje de voz que no debería haber llegado.",
+    "hashtags": {"youtube": ["#Shorts", "#terror", "#relatos", "#misterio"], "tiktok": ["#terror", "#historiasdeterror", "#relatos", "#miedo"], "instagram": ["#terror", "#relatos", "#misterio", "#reels"]},
+    "fuentes": []
+  },
+  {
+    "serie": "lo_que_oi",
+    "tema": "camionero que oye matrículas en una frecuencia vacía",
+    "titulo": "La radio de mi camión dictaba matrículas",
+    "estructura": "pregunta_al_espectador",
+    "tipo_gancho": "sonido",
+    "es_ficcion": true,
+    "gancho": "En esa frecuencia no emite nadie. Y sin embargo...",
+    "escenas": [
+      {"narracion": "Soy camionero. Hago la ruta de noche entre Madrid y Badajoz.", "texto_pantalla": "A-5", "prompt_imagen": "truck cab interior at night on an empty Spanish highway, dashboard glow, rain on windshield", "busqueda_stock": "truck night highway", "sfx": "ninguno"},
+      {"narracion": "Cerca de un puerto de montaña, la radio se sintoniza sola en una frecuencia vacía. Solo ruido.", "texto_pantalla": "", "prompt_imagen": "close up of an old truck radio display glowing in the dark, static", "busqueda_stock": "car radio night", "sfx": "estatica"},
+      {"narracion": "Hasta que una noche, entre el ruido, una voz empezó a dictar matrículas.", "texto_pantalla": "Matrículas", "prompt_imagen": "handwritten numbers and letters on a paper napkin on a truck dashboard, night", "busqueda_stock": "notes on paper", "sfx": "estatica"},
+      {"narracion": "Las apunté en una servilleta. Al llegar a casa, busqué la última. Era la mía. Y la voz había dicho algo más: kilómetro ciento doce.", "texto_pantalla": "Km 112", "prompt_imagen": "highway kilometer marker sign at night in fog, headlights glare", "busqueda_stock": "highway sign night", "sfx": "golpe"}
+    ],
+    "cta": "¿Sigo contando? Síguenos para la segunda parte.",
+    "descripcion": "Relato de ficción. Una frecuencia vacía que no está tan vacía.",
+    "hashtags": {"youtube": ["#Shorts", "#terror", "#misterio", "#carretera"], "tiktok": ["#terror", "#misterio", "#camionero", "#historiasdeterror"], "instagram": ["#terror", "#misterio", "#relatos", "#reels"]},
+    "fuentes": []
+  },
+  {
+    "serie": "lo_que_oi",
+    "tema": "pasos descalzos en la azotea sobre un ático",
+    "titulo": "Llevo tres meses oyendo pasos en el techo",
+    "estructura": "cronologica",
+    "tipo_gancho": "sonido",
+    "es_ficcion": true,
+    "gancho": "Llevo tres meses oyendo pasos en el techo.",
+    "escenas": [
+      {"narracion": "Vivo en un ático en Cádiz. Encima solo está la azotea, cerrada con llave.", "texto_pantalla": "Cádiz", "prompt_imagen": "white rooftop terrace of an old building in Cadiz at night, clotheslines, moonlight", "busqueda_stock": "rooftop night city", "sfx": "viento"},
+      {"narracion": "Los pasos empiezan siempre a medianoche. Van de la ventana a la puerta. Y vuelven.", "texto_pantalla": "00:00", "prompt_imagen": "dark bedroom ceiling seen from the bed, faint light from the window, shadows", "busqueda_stock": "dark bedroom ceiling", "sfx": "latido"},
+      {"narracion": "El casero me dio la llave para quedarme tranquila. Subí con la linterna del móvil.", "texto_pantalla": "", "prompt_imagen": "narrow stairs to a rooftop door, phone flashlight beam in darkness", "busqueda_stock": "flashlight stairs", "sfx": "puerta"},
+      {"narracion": "La azotea estaba vacía. Pero en el polvo del suelo había un camino de huellas descalzas. De la ventana a la puerta. Y terminaban justo encima de mi cama.", "texto_pantalla": "Huellas", "prompt_imagen": "bare footprints in dust on a rooftop floor lit by a flashlight, night", "busqueda_stock": "footprints dust", "sfx": "golpe"}
+    ],
+    "cta": "Esto es Lo que oí.",
+    "descripcion": "Relato de ficción. Nadie sube a esa azotea. Nadie.",
+    "hashtags": {"youtube": ["#Shorts", "#terror", "#historiasdeterror", "#relatos"], "tiktok": ["#terror", "#historiasdeterror", "#miedo", "#creepy"], "instagram": ["#terror", "#relatosdeterror", "#misterio", "#reels"]},
+    "fuentes": []
+  },
+  {
+    "serie": "espana_oculta",
+    "tema": "la Santa Compaña leyenda gallega",
+    "titulo": "La Santa Compaña: la procesión que nadie quiere ver",
+    "estructura": "cronologica",
+    "tipo_gancho": "advertencia",
+    "es_ficcion": false,
+    "gancho": "En Galicia hay procesiones que nadie quiere ver.",
+    "escenas": [
+      {"narracion": "Cuenta la leyenda gallega que, de noche, las almas en pena recorren los caminos en procesión: la Santa Compaña.", "texto_pantalla": "Galicia", "prompt_imagen": "procession of hooded figures carrying candles on a misty Galician forest path at night, seen from far, no faces", "busqueda_stock": "candles night forest", "sfx": "campana"},
+      {"narracion": "Delante va un vivo, con una cruz y un caldero de agua bendita. Según la tradición, no puede volver la cabeza.", "texto_pantalla": "", "prompt_imagen": "old wooden cross and a small iron cauldron on a stone path, fog, candlelight", "busqueda_stock": "stone cross fog", "sfx": "viento"},
+      {"narracion": "Se libra de esa carga entregando la cruz y el caldero a otra persona que se cruce en su camino.", "texto_pantalla": "", "prompt_imagen": "stone crossroads with a Galician granite cross in fog at night", "busqueda_stock": "crossroads fog", "sfx": "ninguno"},
+      {"narracion": "Por eso, dice la tradición, quien la ve debe trazar un círculo en el suelo y meterse dentro. O tumbarse boca abajo hasta que pase.", "texto_pantalla": "Un círculo", "prompt_imagen": "circle drawn on a dirt path with a stick, lantern light, foggy woods", "busqueda_stock": "circle on ground", "sfx": "golpe"}
+    ],
+    "cta": "Leyendas de España, cada semana aquí.",
+    "descripcion": "La Santa Compaña es una de las leyendas más conocidas del folclore gallego. Te contamos lo que dice la tradición.",
+    "hashtags": {"youtube": ["#Shorts", "#leyendas", "#Galicia", "#folclore"], "tiktok": ["#leyendas", "#galicia", "#folclore", "#misterio"], "instagram": ["#leyendas", "#galicia", "#folclore", "#reels"]},
+    "fuentes": ["https://es.wikipedia.org/wiki/Santa_Compa%C3%B1a"]
+  },
+  {
+    "serie": "espana_oculta",
+    "tema": "brujas de Zugarramurdi y el auto de fe de Logroño de 1610",
+    "titulo": "Zugarramurdi: el pueblo que acabó ante la Inquisición",
+    "estructura": "dos_versiones",
+    "tipo_gancho": "dato_concreto",
+    "es_ficcion": false,
+    "gancho": "Este pueblo navarro acabó ante la Inquisición.",
+    "escenas": [
+      {"narracion": "Zugarramurdi, Navarra, mil seiscientos nueve. Varios vecinos son acusados de reunirse en una cueva para celebrar aquelarres.", "texto_pantalla": "1609", "prompt_imagen": "large natural limestone cave in the green hills of northern Navarre, mist, dusk", "busqueda_stock": "limestone cave", "sfx": "goteo"},
+      {"narracion": "El caso llegó al tribunal de la Inquisición de Logroño.", "texto_pantalla": "Logroño", "prompt_imagen": "old parchment documents with wax seals on a wooden desk, candle light, 17th century", "busqueda_stock": "old documents candle", "sfx": "ninguno"},
+      {"narracion": "En noviembre de mil seiscientos diez, un auto de fe condenó a varios acusados. Algunos murieron en la hoguera.", "texto_pantalla": "Noviembre de 1610", "prompt_imagen": "historical oil painting style of a crowded 17th century Spanish town square, distant smoke, no faces", "busqueda_stock": "old town square", "sfx": "campana"},
+      {"narracion": "Uno de los inquisidores había votado en contra por falta de pruebas. Tras una revisión posterior, lo llegó a calificar de terrible injusticia.", "texto_pantalla": "Sin pruebas", "prompt_imagen": "quill pen and handwritten manuscript on a desk, dim candle, dark room", "busqueda_stock": "quill writing", "sfx": "ninguno"}
+    ],
+    "cta": "Historia y leyendas de España, aquí.",
+    "descripcion": "El proceso contra las brujas de Zugarramurdi es uno de los episodios más conocidos de la Inquisición española.",
+    "hashtags": {"youtube": ["#Shorts", "#historia", "#Navarra", "#brujas"], "tiktok": ["#historia", "#españa", "#brujas", "#misterio"], "instagram": ["#historia", "#navarra", "#brujas", "#reels"]},
+    "fuentes": ["https://es.wikipedia.org/wiki/Brujas_de_Zugarramurdi"]
+  },
+  {
+    "serie": "espana_oculta",
+    "tema": "caras de Bélmez de la Moraleda 1971",
+    "titulo": "Las caras de Bélmez: el rostro que apareció en el suelo",
+    "estructura": "dos_versiones",
+    "tipo_gancho": "afirmacion_imposible",
+    "es_ficcion": false,
+    "gancho": "Un día, en esta cocina, apareció un rostro.",
+    "escenas": [
+      {"narracion": "Bélmez de la Moraleda, Jaén. Agosto de mil novecientos setenta y uno.", "texto_pantalla": "Jaén, 1971", "prompt_imagen": "whitewashed village houses in Andalusia at dusk, quiet narrow street, old lamps", "busqueda_stock": "andalusia village", "sfx": "ninguno"},
+      {"narracion": "En el suelo de cemento de una cocina aparece una mancha con forma de cara.", "texto_pantalla": "", "prompt_imagen": "old kitchen floor with a mysterious dark stain vaguely shaped like a face, dim light", "busqueda_stock": "old kitchen floor", "sfx": "latido"},
+      {"narracion": "La rascaron y la taparon con yeso. Según los testimonios, días después volvió a aparecer. Y luego, otras.", "texto_pantalla": "Volvió", "prompt_imagen": "plaster covered floor with faint shapes emerging, cold light, empty room", "busqueda_stock": "plaster wall texture", "sfx": "golpe"},
+      {"narracion": "Llegaron periodistas, curiosos e investigadores. Unos hablan de fenómeno paranormal; otros, de fraude. El debate sigue abierto.", "texto_pantalla": "¿Paranormal o fraude?", "prompt_imagen": "old press cameras and newspapers on a table in a dim room, 1970s style", "busqueda_stock": "old newspapers", "sfx": "estatica"}
+    ],
+    "cta": "¿Tú qué crees? Te leo en comentarios.",
+    "descripcion": "Las caras de Bélmez son uno de los casos más debatidos de España: unos lo consideran paranormal y otros, un fraude.",
+    "hashtags": {"youtube": ["#Shorts", "#misterio", "#Jaén", "#historia"], "tiktok": ["#misterio", "#españa", "#paranormal", "#historia"], "instagram": ["#misterio", "#historia", "#españa", "#reels"]},
+    "fuentes": ["https://es.wikipedia.org/wiki/Caras_de_B%C3%A9lmez"]
+  }
+]

@@ -1,0 +1,27 @@
+# Temas de "España Oculta". Cada guion histórico se escribe SOLO con el texto de su artículo
+# (API oficial de Wikipedia) y después se verifica afirmación por afirmación.
+# Añade temas aquí: título exacto del artículo en es.wikipedia.org y tipo (leyenda | suceso).
+- {articulo: "Santa Compaña", tipo: leyenda}
+- {articulo: "Güestia", tipo: leyenda}
+- {articulo: "Caras de Bélmez", tipo: suceso}
+- {articulo: "Brujas de Zugarramurdi", tipo: suceso}
+- {articulo: "Cuélebre", tipo: leyenda}
+- {articulo: "Nuberu", tipo: leyenda}
+- {articulo: "Trasgu", tipo: leyenda}
+- {articulo: "Xana", tipo: leyenda}
+- {articulo: "Ojáncanu", tipo: leyenda}
+- {articulo: "Basajaun", tipo: leyenda}
+- {articulo: "Tarasca", tipo: leyenda}
+- {articulo: "Sacamantecas", tipo: leyenda}
+- {articulo: "Hombre del saco", tipo: leyenda}
+- {articulo: "Meiga", tipo: leyenda}
+- {articulo: "Tibicena", tipo: leyenda}
+- {articulo: "San Borondón", tipo: leyenda}
+- {articulo: "Cueva de Montesinos", tipo: leyenda}
+- {articulo: "El monte de las ánimas", tipo: leyenda}
+- {articulo: "Ochate", tipo: suceso}
+- {articulo: "Belchite", tipo: suceso}
+- {articulo: "Palacio de Linares", tipo: suceso}
+- {articulo: "Hospital del Tórax", tipo: suceso}
+- {articulo: "Gaueko", tipo: leyenda}
+- {articulo: "Mari (mitología)", tipo: leyenda}

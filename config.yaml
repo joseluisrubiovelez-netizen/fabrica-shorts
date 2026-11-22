@@ -1,0 +1,106 @@
+# Configuración de la fábrica de Shorts. Todo lo secreto va en .env, nunca aquí.
+
+# dry-run: genera sin publicar | review: cola + aviso para aprobar | auto: publica solo
+modo: review
+
+zona_horaria: Europe/Madrid
+
+cadencia:
+  videos_por_dia: 3
+  # Horas razonables para España (comida, tarde, noche). Se aplica un desfase aleatorio.
+  horas: ["13:40", "19:10", "22:20"]
+  jitter_minutos: 12
+  # Un hueco se considera perdido si han pasado más de estas horas sin publicar.
+  tolerancia_retraso_horas: 3
+  # Vídeos aprobados/generados que se intenta tener siempre en cola.
+  cola_objetivo: 6
+  # Máximo de vídeos generados por cada ejecución (para no alargar los jobs).
+  max_generar_por_ejecucion: 2
+
+plataformas:
+  youtube:
+    activo: true
+    categoria_id: "24"          # Entretenimiento
+    privacidad: public           # proyectos sin auditar: YouTube lo fuerza a private
+  tiktok:
+    activo: true
+    modo: manual                 # manual (aviso por Telegram) | api (requiere app auditada)
+    privacidad: SELF_ONLY        # cambia a PUBLIC_TO_EVERYONE tras la auditoría
+  instagram:
+    activo: true
+
+proveedores:
+  guiones: [gemini, groq, semillas]
+  gemini_modelos: [gemini-flash-latest, gemini-flash-lite-latest]
+  groq_modelo: openai/gpt-oss-120b
+  guiones_por_lote: 5
+  imagenes: [cloudflare, pexels, pixabay, procedural]
+  # Proporción aproximada de escenas que usan clip de stock en vez de imagen IA.
+  proporcion_stock: 0.25
+  voz:
+    modelo: models/es_ES-davefx-medium.onnx
+    licencia: "Piper (GPL-3.0, herramienta) · dataset davefx CC0"
+    velocidad: 1.0               # length_scale: >1 más lento
+  whisper:
+    modelo: small                # tiny | base | small (más preciso, más lento)
+
+video:
+  ancho: 1080
+  alto: 1920
+  fps: 30
+  duracion_min: 20
+  duracion_max: 45
+  crf: 20
+
+audio:
+  musica_db: -24                 # nivel de la música bajo la voz
+  sfx_db: -16
+  lufs_objetivo: -14
+
+qa:
+  max_reintentos: 2
+  silencio_max_s: 1.3
+  palabras_por_segundo_max: 4.6
+  lufs_rango: [-17.5, -11.0]
+
+notificaciones:
+  telegram: true
+
+series:
+  - id: expedientes
+    nombre: "Expedientes de la Niebla"
+    tipo: ficcion
+    peso: 0.4
+    premisa: >
+      Archivo ficticio de sucesos inexplicables en pueblos y lugares inventados de España.
+      Cada vídeo es un expediente con número. Tono de informe sobrio que se va torciendo.
+    estilo_visual: >
+      cinematic photo, foggy rural Spain at dusk, desaturated teal and amber grade,
+      35mm film grain, volumetric fog, no people faces, eerie but not gory, vertical composition
+    paleta: {saturacion: 0.75, contraste: 1.08, tinte: [0.92, 1.0, 1.06]}
+    etiqueta_pantalla: "EXPEDIENTE"
+  - id: lo_que_oi
+    nombre: "Lo que oí"
+    tipo: ficcion
+    peso: 0.3
+    premisa: >
+      Relatos en primera persona de gente anónima (inventada) que oyó algo que no debía:
+      porteros automáticos, audios de WhatsApp, radios viejas, pisos de alquiler.
+      Íntimo, cotidiano, urbano.
+    estilo_visual: >
+      cinematic night photo, empty Spanish apartment building, sodium street light,
+      deep shadows, shallow depth of field, grainy, no visible faces, vertical composition
+    paleta: {saturacion: 0.85, contraste: 1.12, tinte: [1.06, 0.98, 0.9]}
+    etiqueta_pantalla: "RELATO"
+  - id: espana_oculta
+    nombre: "España Oculta"
+    tipo: historico
+    peso: 0.3
+    premisa: >
+      Leyendas, folclore y sucesos históricos documentados de España. Lo histórico debe ser
+      verificable y llevar fuentes; las leyendas se presentan como leyendas.
+    estilo_visual: >
+      atmospheric historical illustration, old Spanish village and monastery, candlelight,
+      oil painting texture, muted earth tones, mist, no recognizable people, vertical composition
+    paleta: {saturacion: 0.8, contraste: 1.05, tinte: [1.04, 1.0, 0.92]}
+    etiqueta_pantalla: "LEYENDA"

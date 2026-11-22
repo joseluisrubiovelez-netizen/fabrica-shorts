@@ -1,0 +1,11 @@
+# Música con licencia comercial. SOLO se usan los archivos listados aquí (regla 3).
+# Si no hay ninguno, se genera música ambiental propia por código.
+#
+# Ejemplo (descarga manual desde https://pixabay.com/music/ y copia aquí el MP3):
+# niebla_lenta.mp3:
+#   proveedor: pixabay
+#   fuente: https://pixabay.com/music/...      # URL de la página de la pista
+#   licencia: "Pixabay Content License (uso comercial, sin atribución obligatoria)"
+#   atribucion: null
+#
+# Para Freesound usa SOLO pistas CC0 (licencia: "CC0 1.0").

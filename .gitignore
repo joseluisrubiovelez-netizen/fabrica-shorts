@@ -1,0 +1,31 @@
+# Secretos: nunca al repositorio
+.env
+*.env.local
+client_secret*.json
+token*.json
+
+# Entornos y cachés
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Datos generados (en GitHub Actions viven en la rama 'estado')
+data/
+data_*/
+state/
+*.log
+
+# Modelos descargados (se bajan con make setup)
+models/*.onnx
+models/*.onnx.json
+
+# Música/SFX que descargues: el licencias.yaml SÍ se versiona
+assets/musica/*.mp3
+assets/musica/*.wav
+assets/sfx/*.mp3
+assets/sfx/*.wav
+
+# Web de GitHub Pages (repositorio aparte)
+web/
+.pytest_cache/

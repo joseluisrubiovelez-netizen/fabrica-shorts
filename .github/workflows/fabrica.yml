@@ -1,0 +1,121 @@
+# Ejecución programada gratuita (repositorio PÚBLICO: minutos ilimitados en runners estándar).
+# Cada hora: lee aprobaciones de Telegram, publica en los huecos vencidos y rellena la cola.
+# El estado (SQLite + tokens cifrados) vive en la rama 'estado'; los vídeos en cola, en la
+# release 'cola-videos' (se borran al publicarse).
+name: fabrica
+
+on:
+  schedule:
+    - cron: "7 * * * *"      # UTC; el programador decide en hora de España
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: "dry-run | review | auto (vacío = config.yaml)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write            # rama 'estado' y release 'cola-videos'
+
+concurrency:
+  group: fabrica
+  cancel-in-progress: false
+
+jobs:
+  ciclo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Recuperar estado (rama 'estado')
+        run: |
+          if git ls-remote --exit-code --heads origin estado >/dev/null 2>&1; then
+            git fetch --depth=1 origin estado
+            git worktree add state origin/estado
+          else
+            mkdir -p state
+            git -C state init -b estado
+          fi
+          printf 'data/videos/\ndata/cache/\n' > state/.gitignore
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: FFmpeg y fuentes
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+
+      - name: Caché de modelos (voz Piper y Whisper)
+        uses: actions/cache@v4
+        with:
+          path: |
+            models
+            ~/.cache/huggingface
+          key: modelos-v1
+
+      - name: Dependencias
+        run: |
+          pip install -q -r requirements.txt
+          test -f models/es_ES-davefx-medium.onnx || \
+            python -m piper.download_voices --download-dir models es_ES-davefx-medium
+
+      - name: Ciclo
+        env:
+          FABRICA_DATOS: state/data
+          FABRICA_MODO: ${{ inputs.modo || vars.FABRICA_MODO }}
+          OMP_WAIT_POLICY: PASSIVE
+          GH_TOKEN: ${{ github.token }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+          TIKTOK_REFRESH_TOKEN: ${{ secrets.TIKTOK_REFRESH_TOKEN }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          FABRICA_CLAVE_TOKENS: ${{ secrets.FABRICA_CLAVE_TOKENS }}
+        run: python -m fabrica ciclo
+
+      - name: Guardar estado
+        if: always()
+        run: |
+          cd state
+          git config user.name "fabrica-bot"
+          git config user.email "fabrica-bot@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -qm "estado $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push -q "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" HEAD:estado
+
+      - name: Aviso si el job falla
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          [ -n "$TELEGRAM_BOT_TOKEN" ] && curl -s -o /dev/null \
+            --form-string "chat_id=$TELEGRAM_CHAT_ID" \
+            --form-string "text=❌ El ciclo de la fábrica ha fallado: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" || true
+
+  tests:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: sudo apt-get install -y -qq ffmpeg && pip install -q -r requirements.txt
+      - run: python -m pytest -q tests

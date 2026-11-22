@@ -1,0 +1,9 @@
+# Efectos de sonido con licencia. El nombre debe empezar por el tipo de SFX del guion:
+# viento_*, latido_*, golpe_*, estatica_*, campana_*, puerta_*, goteo_*
+# Si falta un tipo, se sintetiza por código (licencia propia).
+#
+# campana_iglesia.wav:
+#   proveedor: freesound
+#   fuente: https://freesound.org/s/XXXXX/
+#   licencia: "CC0 1.0"
+#   atribucion: null
