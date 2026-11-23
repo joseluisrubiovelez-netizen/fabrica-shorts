@@ -131,3 +131,16 @@ def test_gemini_ok_cuenta_peticion_y_guarda_bruto(con_gemini, db, tmp_path, monk
     assert db.kv_get(f"gemini_tts_peticiones:{pipeline._hoy(con_gemini)}") == "1"
     assert (tmp_path / "v" / "voz_gemini_bruto.wav").exists()
     assert [a["proveedor"] for a in db.assets_de(vid)] == ["gemini-tts"]
+
+
+def test_gancho_largo_se_acelera_hasta_caber():
+    g = _tono(3.4)
+    r = voz_gemini.ajustar_gancho(g, SR)
+    assert voz.PAUSA_INICIAL + len(r) / SR <= voz_gemini.GANCHO_FIN_MAX + 0.05
+
+
+def test_gancho_corto_no_se_toca_y_el_largo_tiene_tope():
+    g = _tono(2.0)
+    assert voz_gemini.ajustar_gancho(g, SR) is g
+    r = voz_gemini.ajustar_gancho(_tono(6.0), SR)
+    assert len(r) / SR >= 6.0 / voz_gemini.GANCHO_ACELERACION_MAX - 0.05

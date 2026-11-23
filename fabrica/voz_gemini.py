@@ -23,7 +23,7 @@ import numpy as np
 import requests
 
 from .utils import ffmpeg_bin, log
-from .voz import Locucion, _montar, _recortar_silencio
+from .voz import PAUSA_INICIAL, Locucion, _montar, _recortar_silencio
 
 L = log("voz_gemini")
 
@@ -40,6 +40,23 @@ VOCES = {"Zephyr", "Puck", "Charon", "Kore", "Fenrir", "Leda", "Orus", "Aoede", 
          "Achird", "Zubenelgenubi", "Vindemiatrix", "Sadachbia", "Sadaltager", "Sulafat"}
 LICENCIA = ("Gemini API TTS (Google AI Studio, plan gratuito); voz sintética, Google no reclama "
             "la propiedad del audio generado")
+
+
+GANCHO_FIN_MAX = 2.85       # s: el QA exige que el gancho termine antes de ~3 s
+GANCHO_ACELERACION_MAX = 1.35
+
+
+def ajustar_gancho(trozo: np.ndarray, sr: int, fin_max: float = GANCHO_FIN_MAX,
+                   tope: float = GANCHO_ACELERACION_MAX) -> np.ndarray:
+    """Acelera solo el gancho si, tras la pausa inicial, no acabaría antes de `fin_max`.
+    Gemini narra con más calma que Piper y el gancho se pasaba de 3 s en casi todos los vídeos."""
+    dur = len(trozo) / sr
+    disponible = fin_max - PAUSA_INICIAL
+    if dur <= disponible:
+        return trozo
+    factor = min(tope, dur / disponible)
+    L.info("Gancho de %.2fs: lo acelero x%.2f para que acabe antes de %.1fs", dur, factor, fin_max)
+    return atempo(trozo, sr, factor)
 
 
 class GeminiVozError(RuntimeError):
@@ -214,6 +231,7 @@ def generar_locucion(segmentos_texto: list[str], salida: Path, dur_min: float, d
     factor = velocidad
     for _ in range(3):
         trozos = cortar(atempo(x, sr, factor), sr, textos)
+        trozos[0] = ajustar_gancho(trozos[0], sr)
         audio, tramos, voz_seg = _montar(trozos, sr, n_escenas)
         dur = len(audio) / sr
         objetivo = dur_max - 2.0 if dur > dur_max - 0.5 else dur_min + 2.0 if dur < dur_min + 0.5 \
