@@ -14,7 +14,12 @@ from .utils import log
 L = log("avisos")
 API = "https://api.telegram.org/bot{token}/{metodo}"
 LIMITE_VIDEO = 49 * 1024 * 1024
-COMANDO = re.compile(r"^/(aprobar|descartar|estado)(?:@\w+)?(?:\s+(\d+))?", re.I)
+# Acepta "/aprobar 5" y "/aprobar_5": en Telegram, al tocar un comando de un mensaje solo se
+# envía la parte sin espacios, así que los avisos usan la forma con guion bajo.
+COMANDO = re.compile(r"^/(aprobar|descartar|estado)(?:_(\d+))?(?:@\w+)?(?:\s+(\d+))?", re.I)
+REFERENCIA = re.compile(r"#(\d+)")
+# Proporción de los vídeos: sin ella, Telegram a veces los muestra aplastados.
+ANCHO_VIDEO, ALTO_VIDEO = 1080, 1920
 
 
 class Notificador:
@@ -52,7 +57,8 @@ class Notificador:
             return False
         with open(ruta, "rb") as f:
             r = self._llamar("sendVideo", data={"chat_id": self.chat, "caption": texto[:1000],
-                                                "supports_streaming": "true"},
+                                                "supports_streaming": "true",
+                                                "width": ANCHO_VIDEO, "height": ALTO_VIDEO},
                              files={"video": (ruta.name, f, "video/mp4")})
         return bool(r and r.get("ok"))
 
@@ -62,7 +68,7 @@ class Notificador:
             extra = "\n" + meta["descripcion"][meta["descripcion"].index("Fuentes:"):][:400]
             extra += "\n⚠️ Histórico: comprueba los hechos con la fuente antes de aprobar."
         texto = (f"🎬 Vídeo #{video_id} listo para revisar\n{meta.get('serie', '')}: "
-                 f"{meta['titulo']}{extra}\n\nResponde /aprobar {video_id} o /descartar {video_id}")
+                 f"{meta['titulo']}{extra}\n\nToca /aprobar_{video_id} o /descartar_{video_id}")
         self.enviar_video(ruta, texto)
 
     def aviso_subida_manual(self, plataforma: str, video_id: int, ruta: Path,
@@ -87,8 +93,22 @@ class Notificador:
             msg = u.get("message") or {}
             if str((msg.get("chat") or {}).get("id")) != str(self.chat):
                 continue
-            m = COMANDO.match((msg.get("text") or "").strip())
-            if m:
-                cmds.append((m.group(1).lower(), int(m.group(2)) if m.group(2) else None))
+            cmd = interpretar(msg)
+            if cmd:
+                cmds.append(cmd)
         self.db.kv_set("telegram_offset", str(offset))
         return cmds
+
+
+def interpretar(msg: dict[str, Any]) -> tuple[str, int | None] | None:
+    """Saca (orden, nº de vídeo) de un mensaje. Sin número, si el mensaje responde al aviso de
+    un vídeo, se usa el «#N» de ese aviso."""
+    m = COMANDO.match((msg.get("text") or "").strip())
+    if not m:
+        return None
+    num = m.group(2) or m.group(3)
+    if not num:
+        citado = msg.get("reply_to_message") or {}
+        ref = REFERENCIA.search(citado.get("caption") or citado.get("text") or "")
+        num = ref.group(1) if ref else None
+    return m.group(1).lower(), int(num) if num else None

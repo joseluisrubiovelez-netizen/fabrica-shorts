@@ -36,7 +36,7 @@ config.yaml ─┐
 | `make dry-run` | Genera un vídeo sin publicar |
 | `python -m fabrica --modo dry-run generar --n 10` | Genera 10 vídeos de prueba |
 | `python -m fabrica estado` | Estado de la cola |
-| `python -m fabrica aprobar 12` / `descartar 12` | También por Telegram: `/aprobar 12` |
+| `python -m fabrica aprobar 12` / `descartar 12` | También por Telegram: `/aprobar_12` |
 | `python -m fabrica publicar 12` | Publica ya un vídeo concreto |
 | `python -m fabrica informe` | Informe de analítica ahora |
 | `python -m fabrica verificar` | Qué claves faltan |
