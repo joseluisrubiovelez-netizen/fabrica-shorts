@@ -10,6 +10,7 @@ switch ($Orden) {
         & $py -m pip install --upgrade pip
         & $py -m pip install -r requirements.txt
         & $py -m piper.download_voices --download-dir models es_ES-davefx-medium
+        & $py -m fabrica.profundidad descargar
         if (-not (Test-Path .env)) { Copy-Item .env.example .env }
         & $py -m fabrica verificar
     }

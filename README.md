@@ -4,6 +4,8 @@ Genera y publica de forma automática vídeos verticales (YouTube Shorts, TikTok
 
 - Configuración inicial: [SETUP.md](SETUP.md)
 - Límites del plan gratuito y riesgos: [docs/limites_y_riesgos.md](docs/limites_y_riesgos.md)
+- Herramienta 3D aparte (convierte cualquier imagen en un clip 3D, para otros vídeos):
+  [herramientas/efecto3d/LEEME.md](herramientas/efecto3d/LEEME.md)
 
 ## Cómo funciona
 

@@ -162,7 +162,8 @@ def _producir_intento(cfg: Config, db: DB, g: dict[str, Any], serie: dict[str, A
     salida = carpeta / "video.mp4"
     render.montar(escenas, cues, mezcla, salida, gancho=g["gancho"], etiqueta_sup=etiqueta_sup,
                   estilo=estilo, duracion=loc.duracion, W=vcfg["ancho"], H=vcfg["alto"],
-                  fps=vcfg["fps"], crf=vcfg.get("crf", 20), raiz=str(cfg.raiz))
+                  fps=vcfg["fps"], crf=vcfg.get("crf", 20), raiz=str(cfg.raiz),
+                  modo3d=render.Modo3D.desde(vcfg.get("modo_3d")))
     crono("montaje")
     # 6) QA
     assets = [dict(r) for r in db.assets_de(video_id)]
