@@ -108,3 +108,21 @@ def test_metadatos_marcan_ficcion_e_ia(cfg):
     assert meta["descripcion"].startswith("Relato de ficción")
     assert "IA" in meta["descripcion"] and "Pexels" in meta["descripcion"]
     assert meta["es_ficcion"] is True
+
+
+def test_interpretar_comandos_de_telegram():
+    from fabrica.notify import interpretar
+    aviso = {"caption": "🎬 Vídeo #7 listo para revisar\n\nToca /aprobar_7 o /descartar_7"}
+    assert interpretar({"text": "/aprobar 5"}) == ("aprobar", 5)
+    assert interpretar({"text": "/aprobar_5"}) == ("aprobar", 5)
+    assert interpretar({"text": "/descartar_12@fabrica_bot"}) == ("descartar", 12)
+    assert interpretar({"text": "/aprobar", "reply_to_message": aviso}) == ("aprobar", 7)
+    assert interpretar({"text": "/aprobar"}) == ("aprobar", None)
+    assert interpretar({"text": "/estado"}) == ("estado", None)
+    assert interpretar({"text": "hola"}) is None
+
+
+def test_aprobar_sin_numero_pide_el_numero(db):
+    n = NotifFalso()
+    cli.aplicar_comandos(db, n, [("aprobar", None)])
+    assert any("Falta el número" in m for m in n.mensajes)

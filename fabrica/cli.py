@@ -42,7 +42,11 @@ def aplicar_comandos(db: DB, notif, comandos) -> None:
         if orden == "estado":
             notif.enviar(texto_estado(db))
             continue
-        fila = db.video(vid) if vid else None
+        if vid is None:
+            notif.enviar(f"Falta el número del vídeo. Escribe /{orden}_N (por ejemplo "
+                         f"/{orden}_5) o responde al mensaje del vídeo con /{orden}.")
+            continue
+        fila = db.video(vid)
         if not fila:
             notif.enviar(f"No existe el vídeo #{vid}")
             continue
@@ -93,7 +97,7 @@ def cmd_ciclo(a) -> int:
             pend = len(db.videos_en_estado(PENDIENTE))
             if pend and db.kv_get("aviso_cola") != ahora.date().isoformat():
                 notif.enviar(f"⏳ Quedan pocos vídeos aprobados. Tienes {pend} esperando "
-                             "revisión (/aprobar N).")
+                             "revisión (/aprobar_N).")
                 db.kv_set("aviso_cola", ahora.date().isoformat())
         if analytics.toca_informe(db, ahora.date()):
             estado = analytics.recoger(cfg, db)

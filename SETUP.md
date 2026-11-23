@@ -47,7 +47,7 @@ Debe aparecer un vídeo en `data/videos/00001/final.mp4`.
 2. Escríbele cualquier cosa a tu bot.
 3. Abre en el navegador `https://api.telegram.org/bot<TOKEN>/getUpdates` y copia `"chat":{"id": ...}` en `TELEGRAM_CHAT_ID`.
 
-El bot solo obedece a ese chat. Comandos: `/aprobar 12`, `/descartar 12`, `/estado`.
+El bot solo obedece a ese chat. Comandos: `/aprobar 12` (o `/aprobar_12`, que se puede tocar en el aviso), `/descartar 12`, `/estado`. También puedes responder al aviso del vídeo con `/aprobar` a secas.
 
 ## 3. Guiones: Gemini y Groq — 5 min
 
@@ -158,6 +158,6 @@ Ten en cuenta que en un repositorio público el código y la base de datos (guio
 
 ## 13. Uso diario
 
-- **Semanas 1-2 (`review`)**: te llega cada vídeo por Telegram; respondes `/aprobar N` o `/descartar N`. Solo se publica lo aprobado, a las horas de `config.yaml`.
+- **Semanas 1-2 (`review`)**: te llega cada vídeo por Telegram; tocas `/aprobar_N` o `/descartar_N` en el aviso. Solo se publica lo aprobado, a las horas de `config.yaml`.
 - **Después (`auto`)**: cambia la variable `FABRICA_MODO` a `auto`. Si algo falla (token caducado, cuota agotada, QA fallido), te llega un aviso.
 - **Los lunes** se genera el informe semanal en `data/informes/` (en la rama `estado`).
