@@ -85,10 +85,57 @@ def graduar(img: Image.Image, e: Estilo) -> Image.Image:
     return Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
 
 
-class FuenteImagen:
-    """Imagen fija con movimiento de cámara suave (subpíxel, sin temblores)."""
+@dataclass
+class Modo3D:
+    """Parallax 2.5D: cada píxel se mueve según su profundidad, como una cámara real."""
+    activo: bool = False
+    intensidad: float = 1.0          # separación entre planos (0.5 suave, 1.5 marcado)
+    desenfoque_fondo: float = 0.5    # 0 = todo nítido, 1 = fondo muy desenfocado
+    modelo: str | None = None        # ruta al .onnx (por defecto models/depth_anything_...)
 
-    def __init__(self, esc: Escena, W: int, H: int, estilo: Estilo):
+    @classmethod
+    def desde(cls, d: dict[str, Any] | None) -> "Modo3D":
+        d = d or {}
+        return cls(activo=bool(d.get("activo", False)),
+                   intensidad=float(d.get("intensidad", 1.0)),
+                   desenfoque_fondo=float(d.get("desenfoque_fondo", 0.5)),
+                   modelo=d.get("modelo"))
+
+
+def parametros_parallax(movimiento: str, p: float, amp: float, intensidad: float
+                        ) -> tuple[float, float, float]:
+    """(desplazamiento x, desplazamiento y, zoom diferencial) del plano más cercano.
+
+    Los cercanos se desplazan más que el fondo en el sentido del barrido y crecen más al
+    acercarse: es lo que el ojo lee como profundidad."""
+    q = 2 * p - 1
+    ox = oy = 0.0
+    if "izq" in movimiento:
+        ox = -amp * q
+    elif "der" in movimiento:
+        ox = amp * q
+    if movimiento == "pan_arriba":
+        oy = -amp * q
+    elif movimiento == "pan_abajo":
+        oy = amp * q
+    zp = 0.0
+    if "zoom_in" in movimiento:
+        zp = 0.09 * intensidad * p
+    elif "zoom_out" in movimiento:
+        zp = 0.09 * intensidad * (1 - p)
+    if movimiento in ("zoom_in", "zoom_out"):
+        ox = 0.45 * amp * q          # leve órbita lateral para que el relieve se note
+    return ox, oy, zp
+
+
+class FuenteImagen:
+    """Imagen fija con movimiento de cámara suave (subpíxel, sin temblores).
+
+    Con el modo 3D activo, la imagen se separa en planos según un mapa de profundidad y la
+    cámara se mueve entre ellos (parallax), con el fondo ligeramente desenfocado."""
+
+    def __init__(self, esc: Escena, W: int, H: int, estilo: Estilo,
+                 modo3d: Modo3D | None = None, raiz: str = "."):
         img = Image.open(esc.ruta).convert("RGB")
         escala = max(W * 1.2 / img.width, H * 1.2 / img.height)
         img = img.resize((math.ceil(img.width * escala), math.ceil(img.height * escala)),
@@ -96,6 +143,43 @@ class FuenteImagen:
         self.img = np.ascontiguousarray(np.asarray(graduar(img, estilo)))
         self.W, self.H, self.esc = W, H, esc
         self.dur = (esc.fin - esc.ini) + TRANSICION
+        self.modo3d = modo3d if modo3d and modo3d.activo else None
+        self.prof: np.ndarray | None = None
+        self.metodo_prof = ""
+        if self.modo3d:
+            from . import profundidad
+            self.prof, self.metodo_prof = profundidad.estimar(self.img, raiz, self.modo3d.modelo)
+            dof = max(0.0, min(1.0, self.modo3d.desenfoque_fondo))
+            if dof > 0:
+                borroso = cv2.GaussianBlur(self.img, (0, 0), max(1.0, W / 220))
+                peso = (dof * (1 - self.prof) ** 2)[:, :, None]
+                self.img = np.ascontiguousarray(
+                    (self.img * (1 - peso) + borroso * peso).astype(np.uint8))
+            # El desplazamiento es suave: se calcula a 1/4 de resolución y se amplía. La
+            # muestra i corresponde al píxel k·i + (k-1)/2 (centros de cv2.resize).
+            k = 4
+            self.u, self.v = np.meshgrid(
+                np.arange(W // k, dtype=np.float32) * k + (k - 1) / 2,
+                np.arange(H // k, dtype=np.float32) * k + (k - 1) / 2)
+
+    def _frame_3d(self, x0: float, y0: float, bw: float, bh: float, s: float,
+                  p: float) -> np.ndarray:
+        assert self.modo3d is not None and self.prof is not None
+        amp = 0.035 * self.modo3d.intensidad * bw
+        ox, oy, zp = parametros_parallax(self.esc.movimiento, p, amp, self.modo3d.intensidad)
+        bx = x0 + self.u / s
+        by = y0 + self.v / s
+        cx, cy = x0 + bw / 2, y0 + bh / 2
+        mx, my = bx, by
+        for _ in range(2):  # la profundidad se lee donde cae la muestra: 2 pasadas bastan
+            d = cv2.remap(self.prof, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
+            f = 1.0 / (1.0 + zp * d)
+            mx = cx + (bx - cx) * f + ox * d
+            my = cy + (by - cy) * f + oy * d
+        tam = (self.W, self.H)
+        mx = cv2.resize(mx, tam, interpolation=cv2.INTER_LINEAR)
+        my = cv2.resize(my, tam, interpolation=cv2.INTER_LINEAR)
+        return cv2.remap(self.img, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
 
     def frame(self, t: float) -> np.ndarray:
         p = _ease((t - self.esc.ini + TRANSICION / 2) / self.dur)
@@ -124,6 +208,8 @@ class FuenteImagen:
             cy = 0.15 + 0.7 * p
         x0, y0 = libre_x * cx, libre_y * cy
         s = self.W / bw
+        if self.modo3d:
+            return self._frame_3d(x0, y0, bw, bh, s, p)
         M = np.float32([[s, 0, -x0 * s], [0, s, -y0 * s]])
         return cv2.warpAffine(self.img, M, (self.W, self.H), flags=cv2.INTER_LINEAR,
                               borderMode=cv2.BORDER_REFLECT)
@@ -261,11 +347,14 @@ class Subtitulador:
 def montar(escenas: list[Escena], cues: list[Cue], audio: Path, salida: Path, *,
            gancho: str, etiqueta_sup: str, estilo: Estilo, duracion: float, W: int = 1080,
            H: int = 1920, fps: int = 30, crf: int = 20, raiz: str = ".",
-           preset: str = "veryfast") -> Path:
+           preset: str = "veryfast", modo3d: Modo3D | None = None) -> Path:
     fuentes: list[Any] = []
     for e in escenas:
         fuentes.append(FuenteClip(e, W, H, fps, estilo) if e.tipo == "clip"
-                       else FuenteImagen(e, W, H, estilo))
+                       else FuenteImagen(e, W, H, estilo, modo3d, raiz))
+    metodos = sorted({f.metodo_prof for f in fuentes if getattr(f, "metodo_prof", "")})
+    if metodos:
+        L.info("Modo 3D activo (profundidad: %s)", ", ".join(metodos))
     sub = Subtitulador(cues, W, estilo, raiz)
     capa_gancho = Capa(_caja_texto(gancho.upper(), 84, W - 200, estilo, raiz))
     fin_gancho = min(2.9, escenas[0].fin)

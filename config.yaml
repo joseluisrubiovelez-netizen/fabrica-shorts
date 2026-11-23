@@ -59,6 +59,13 @@ video:
   duracion_min: 20
   duracion_max: 45
   crf: 20
+  # Modo 3D: separa cada imagen en planos por profundidad y mueve la cámara entre ellos
+  # (parallax 2.5D). Usa Depth Anything V2 Small si está en models/ (se baja con setup);
+  # si no, una estimación aproximada. Los clips de stock no cambian.
+  modo_3d:
+    activo: true
+    intensidad: 1.0              # 0.5 suave · 1.0 normal · 1.5 marcado
+    desenfoque_fondo: 0.5        # 0 todo nítido · 1 fondo muy desenfocado
 
 audio:
   musica_db: -24                 # nivel de la música bajo la voz

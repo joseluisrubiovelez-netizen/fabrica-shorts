@@ -47,19 +47,20 @@ jobs:
       - name: FFmpeg y fuentes
         run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
 
-      - name: Caché de modelos (voz Piper y Whisper)
+      - name: Caché de modelos (voz Piper, Whisper y profundidad 3D)
         uses: actions/cache@v4
         with:
           path: |
             models
             ~/.cache/huggingface
-          key: modelos-v1
+          key: modelos-v2
 
       - name: Dependencias
         run: |
           pip install -q -r requirements.txt
           test -f models/es_ES-davefx-medium.onnx || \
             python -m piper.download_voices --download-dir models es_ES-davefx-medium
+          python -m fabrica.profundidad descargar
 
       - name: Ciclo
         env:

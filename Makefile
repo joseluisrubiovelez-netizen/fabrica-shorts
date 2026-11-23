@@ -11,6 +11,7 @@ setup:
 	$(PY) -m pip install --upgrade pip
 	$(PY) -m pip install -r requirements.txt
 	$(PY) -m piper.download_voices --download-dir models es_ES-davefx-medium
+	$(PY) -m fabrica.profundidad descargar
 	@test -f .env || cp .env.example .env
 	$(PY) -m fabrica verificar
 
