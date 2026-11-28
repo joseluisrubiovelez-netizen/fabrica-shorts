@@ -13,7 +13,8 @@ import requests
 from ..config import Config
 from ..tokens import AlmacenTokens
 from ..utils import log
-from . import CuotaAgotada, ErrorPublicacion, SinCredenciales, TokenCaducado
+from . import (CuotaAgotada, ErrorPublicacion, PlataformaBloqueada, SinCredenciales,
+               TokenCaducado)
 
 L = log("instagram")
 TIMEOUT = 60
@@ -51,6 +52,8 @@ def token(cfg: Config) -> tuple[str, str]:
             tok = d["access_token"]
             almacen.set("instagram", {"access_token": tok, "renovado": time.time()})
         elif g.get("renovado"):
+            if "api access blocked" in str(d.get("error", "")).lower():
+                _comprobar(r)   # lanza PlataformaBloqueada: no es un token caducado
             raise TokenCaducado(f"Instagram: no se pudo renovar el token ({d.get('error')})")
     return tok, uid
 
@@ -59,6 +62,9 @@ def _comprobar(r: requests.Response) -> dict[str, Any]:
     d = r.json()
     if "error" in d:
         e = d["error"]
+        # Veto de Meta a la app o a la cuenta de desarrollador: no se arregla reintentando ya.
+        if "api access blocked" in str(e.get("message", "")).lower():
+            raise PlataformaBloqueada(f"Instagram: {e.get('message')}")
         if e.get("code") == 190:
             raise TokenCaducado(f"Instagram: token inválido ({e.get('message')})")
         if e.get("code") in (4, 9, 17, 32, 613) or "limit" in str(e.get("message", "")).lower():

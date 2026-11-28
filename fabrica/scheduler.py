@@ -57,6 +57,17 @@ def huecos_vencidos(ahora: datetime, cfg: Config, db: DB) -> tuple[list[datetime
     return pendientes, perdidos
 
 
+def hueco_actual(ahora: datetime, cfg: Config) -> datetime | None:
+    """El último hueco ya alcanzado que sigue dentro de la tolerancia, o None."""
+    tz = cfg["zona_horaria"]
+    local = ahora.astimezone(ZoneInfo(tz))
+    tol = timedelta(hours=float(cfg["cadencia"].get("tolerancia_retraso_horas", 3)))
+    vigentes = [h for dia in (local.date() - timedelta(days=1), local.date())
+                for h in huecos_del_dia(dia, cfg["cadencia"], tz)
+                if timedelta(0) <= local - h <= tol]
+    return max(vigentes, default=None)
+
+
 def proximo_hueco(ahora: datetime, cfg: Config) -> datetime:
     tz = cfg["zona_horaria"]
     local = ahora.astimezone(ZoneInfo(tz))
