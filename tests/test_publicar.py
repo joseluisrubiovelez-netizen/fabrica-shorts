@@ -1,11 +1,18 @@
+from datetime import date, timedelta
+from pathlib import Path
+
 import pytest
 from conftest import crear_video
 
 from fabrica import analytics
+from fabrica.cli import aplicar_comandos
 from fabrica.db import APROBADO
-from fabrica.publicar import MANUAL, PUBLICADO, CuotaAgotada, SinCredenciales, publicar_video
+from fabrica.db import PUBLICADO as VIDEO_PUBLICADO
+from fabrica.publicar import (BLOQUEADO, ERROR, MANUAL, PUBLICADO, CuotaAgotada,
+                              PlataformaBloqueada, SinCredenciales, instagram, publicar_video,
+                              reintentar_retenidos)
 from fabrica.publicar.youtube import cuerpo_video
-
+from fabrica.scheduler import huecos_del_dia
 
 @pytest.fixture
 def video(db, tmp_path):
@@ -92,3 +99,124 @@ def test_analitica_no_inventa(cfg, db, video):
     assert "120" in texto and "71.5 %" in texto
     assert "sin datos" in texto                         # Instagram sin datos: no se estima
     assert estado["instagram"] == "0/1 con datos"
+
+
+# ---------- plataforma bloqueada: se retiene el vídeo y se reintenta ----------
+
+class AlmacenFalso:
+    def __init__(self):
+        self.borrados = []
+
+    def descargar(self, vid):
+        return None
+
+    def borrar(self, vid):
+        self.borrados.append(vid)
+
+
+def _bloqueado(*a):
+    raise PlataformaBloqueada("Instagram: API access blocked.")
+
+
+def _ok(*a):
+    return {"id": "x", "url": "https://x/reel"}
+
+
+def _publicar_bloqueado(cfg, db, video, n, almacen):
+    ok = publicar_video(cfg, db, video, n, almacen,
+                        subidores={"youtube": _ok, "instagram": _bloqueado})
+    if ok:
+        db.actualizar_video(video["id"], estado=VIDEO_PUBLICADO)
+    return ok
+
+
+def _hueco(cfg, dias=0):
+    """Un momento justo después del primer hueco de un día fijo."""
+    h = huecos_del_dia(date(2026, 11, 23) + timedelta(days=dias), cfg["cadencia"],
+                       cfg["zona_horaria"])[0]
+    return h + timedelta(minutes=1)
+
+
+def test_instagram_reconoce_el_bloqueo():
+    class R:
+        def json(self):
+            return {"error": {"code": 200, "message": "API access blocked."}}
+    with pytest.raises(PlataformaBloqueada):
+        instagram._comprobar(R())
+
+
+def test_bloqueo_retiene_el_video_y_no_frena_la_cola(cfg, db, video):
+    n, alm = Notif(), AlmacenFalso()
+    for _ in range(4):
+        assert _publicar_bloqueado(cfg, db, video, n, alm)   # YouTube sale: la cola avanza
+    pub = db.publicacion(video["id"], "instagram")
+    assert pub["estado"] == BLOQUEADO and pub["intentos"] == 0
+    assert alm.borrados == []                               # el archivo se conserva
+    assert "instagram" not in n.manuales
+    avisos = [m for m in n.mensajes if "bloque" in m.lower()]
+    assert len(avisos) == 1 and f"/descartar_{video['id']}" in avisos[0]
+
+
+def test_reintento_publica_al_desbloquear(cfg, db, video):
+    n, alm = Notif(), AlmacenFalso()
+    _publicar_bloqueado(cfg, db, video, n, alm)
+    assert reintentar_retenidos(_hueco(cfg), cfg, db, n, alm,
+                                subidores={"instagram": _ok}) == video["id"]
+    assert db.publicacion(video["id"], "instagram")["estado"] == PUBLICADO
+    assert alm.borrados == [video["id"]]
+    assert any("https://x/reel" in m for m in n.mensajes)
+
+
+def test_reintento_uno_por_hueco(cfg, db, video):
+    n, alm, llamadas = Notif(), AlmacenFalso(), []
+
+    def sigue(*a):
+        llamadas.append(1)
+        _bloqueado()
+    _publicar_bloqueado(cfg, db, video, n, alm)
+    subs = {"instagram": sigue}
+    reintentar_retenidos(_hueco(cfg), cfg, db, n, alm, subidores=subs)
+    reintentar_retenidos(_hueco(cfg) + timedelta(hours=1), cfg, db, n, alm, subidores=subs)
+    assert len(llamadas) == 1
+    reintentar_retenidos(_hueco(cfg, dias=1), cfg, db, n, alm, subidores=subs)
+    assert len(llamadas) == 2 and alm.borrados == []
+
+
+def test_sin_hueco_no_reintenta(cfg, db, video):
+    n, alm = Notif(), AlmacenFalso()
+    _publicar_bloqueado(cfg, db, video, n, alm)
+    madrugada = _hueco(cfg).replace(hour=8, minute=0)
+    assert reintentar_retenidos(madrugada, cfg, db, n, alm, subidores={"instagram": _ok}) is None
+
+
+def test_error_distinto_en_reintento_sigue_retenido_hasta_manual(cfg, db, video):
+    n, alm = Notif(), AlmacenFalso()
+    _publicar_bloqueado(cfg, db, video, n, alm)
+
+    def roto(*a):
+        raise RuntimeError("500")
+    for dia in range(2):
+        reintentar_retenidos(_hueco(cfg, dia), cfg, db, n, alm, subidores={"instagram": roto})
+    assert db.publicacion(video["id"], "instagram")["estado"] == ERROR
+    reintentar_retenidos(_hueco(cfg, 2), cfg, db, n, alm, subidores={"instagram": roto})
+    assert db.publicacion(video["id"], "instagram")["estado"] == MANUAL
+    assert alm.borrados == [video["id"]]
+
+
+def test_archivo_perdido_no_rompe_el_ciclo(cfg, db, video):
+    n, alm = Notif(), AlmacenFalso()
+    _publicar_bloqueado(cfg, db, video, n, alm)
+    Path(video["ruta"]).unlink()
+    reintentar_retenidos(_hueco(cfg), cfg, db, n, alm, subidores={"instagram": _ok})
+    assert db.publicacion(video["id"], "instagram")["estado"] == BLOQUEADO
+
+
+def test_descartar_deja_de_reintentar(cfg, db, video):
+    n, alm = Notif(), AlmacenFalso()
+    _publicar_bloqueado(cfg, db, video, n, alm)
+    aplicar_comandos(db, n, [("descartar", video["id"])], alm)
+    assert db.publicacion(video["id"], "instagram")["estado"] == MANUAL
+    assert db.video(video["id"])["estado"] == VIDEO_PUBLICADO   # YouTube ya salió
+    assert alm.borrados == [video["id"]]
+    assert reintentar_retenidos(_hueco(cfg), cfg, db, n, alm,
+                                subidores={"instagram": _ok}) is None

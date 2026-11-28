@@ -9,6 +9,7 @@ from pathlib import Path
 
 from .config import cargar_config
 from .db import APROBADO, DB, DESCARTADO, DRY, PENDIENTE, PUBLICADO
+from .publicar import BLOQUEADO, abandonar_retenidos
 from .utils import log
 
 L = log("cli")
@@ -37,7 +38,7 @@ def cmd_guiones(a) -> int:
     return 0
 
 
-def aplicar_comandos(db: DB, notif, comandos) -> None:
+def aplicar_comandos(db: DB, notif, comandos, almacen=None) -> None:
     for orden, vid in comandos:
         if orden == "estado":
             notif.enviar(texto_estado(db))
@@ -56,6 +57,9 @@ def aplicar_comandos(db: DB, notif, comandos) -> None:
         elif orden == "descartar" and fila["estado"] in (PENDIENTE, APROBADO):
             db.actualizar_video(vid, estado=DESCARTADO)
             notif.enviar(f"🗑️ Vídeo #{vid} descartado.")
+        elif (orden == "descartar" and fila["estado"] == PUBLICADO
+              and (plats := abandonar_retenidos(db, vid, almacen))):
+            notif.enviar(f"🗑️ Vídeo #{vid}: ya no se reintentará en {', '.join(plats)}.")
         else:
             notif.enviar(f"El vídeo #{vid} está en estado '{fila['estado']}'; no se cambia.")
 
@@ -67,6 +71,10 @@ def texto_estado(db: DB) -> str:
     lineas = [f"Pendientes de aprobar: {c.get(PENDIENTE, 0)}", f"Aprobados en cola: "
               f"{c.get(APROBADO, 0)}", f"Publicados: {c.get(PUBLICADO, 0)}",
               f"Descartados: {c.get(DESCARTADO, 0)}", f"Dry-run: {c.get(DRY, 0)}"]
+    retenidos = db.publicaciones(BLOQUEADO)
+    if retenidos:
+        lineas.append("Retenidos por bloqueo: " + ", ".join(
+            f"#{r['video_id']} ({r['plataforma']})" for r in retenidos))
     if ev:
         lineas.append("Últimos errores: " + " | ".join(e["mensaje"][:120] for e in ev))
     return "\n".join(lineas)
@@ -76,13 +84,15 @@ def cmd_ciclo(a) -> int:
     """Lo que ejecuta el programador cada hora."""
     from . import analytics, pipeline, scheduler
     from .almacen import Almacen
-    from .publicar import publicar_video
+    from .publicar import publicar_video, reintentar_retenidos
     cfg, db, notif = _contexto(a.modo)
     almacen = Almacen(cfg)
     ahora = datetime.fromisoformat(a.ahora) if a.ahora else datetime.now(timezone.utc)
     L.info("Ciclo en modo %s (%s)", cfg.modo, ahora.isoformat())
-    aplicar_comandos(db, notif, notif.leer_comandos())
+    aplicar_comandos(db, notif, notif.leer_comandos(), almacen)
     if cfg.modo != "dry-run":
+        # Antes de los huecos: así no reintenta en el acto lo que acaba de bloquearse.
+        reintentar_retenidos(ahora, cfg, db, notif, almacen)
         hechos = scheduler.procesar_huecos(
             ahora, cfg, db, lambda v: publicar_video(cfg, db, v, notif, almacen), notif)
         if hechos:
@@ -114,8 +124,9 @@ def cmd_aprobar(a) -> int:
 
 
 def cmd_descartar(a) -> int:
-    _, db, notif = _contexto(None)
-    aplicar_comandos(db, notif, [("descartar", a.id)])
+    from .almacen import Almacen
+    cfg, db, notif = _contexto(None)
+    aplicar_comandos(db, notif, [("descartar", a.id)], Almacen(cfg))
     return 0
 
 
